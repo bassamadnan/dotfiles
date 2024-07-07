@@ -1,21 +1,21 @@
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
--- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
-
--- [[ Setting options ]]
--- See `:help vim.opt`
--- NOTE: You can change these options as you wish!
---  For more options, you can see `:help option-list`
-
--- Make line numbers default
-vim.opt.number = true
--- You can also add relative line numbers, to help with jumping.
---  Experiment for yourself to see if you like it!
+-- vim.g.mapleader = ' '
+-- vim.g.maplocalleader = ' '
+--
+-- -- Set to true if you have a Nerd Font installed and selected in the terminal
+-- vim.g.have_nerd_font = false
+--
+-- -- [[ Setting options ]]
+-- -- See `:help vim.opt`
+-- -- NOTE: You can change these options as you wish!
+-- --  For more options, you can see `:help option-list`
+--
+-- -- Make line numbers default
+-- vim.opt.number = true
+-- -- You can also add relative line numbers, to help with jumping.
+-- Experiment for yourself to see if you like it!
 vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
@@ -74,8 +74,6 @@ vim.opt.scrolloff = 10
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-vim.keymap.set('i', ':w', '<Esc>')
-vim.keymap.set('i', ':q', '<Esc>')
 vim.keymap.set('n', '<leader>pv', '<cmd>Ex<CR>', { desc = 'Open Ex file explorer' })
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
@@ -144,6 +142,7 @@ vim.opt.rtp:prepend(lazypath)
 --    :Lazy update
 --
 -- NOTE: Here is where you install your plugins.
+
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
@@ -228,6 +227,36 @@ require('lazy').setup({
     end,
   },
   {
+    'numToStr/Comment.nvim',
+    opts = {
+      -- add any options here
+    },
+  },
+  {
+    'preservim/nerdcommenter',
+    event = { 'BufReadPre', 'BufNewFile' },
+    config = function()
+      -- NERDCommenter settings
+      vim.g.NERDCreateDefaultMappings = 1
+      vim.g.NERDSpaceDelims = 1
+      vim.g.NERDCompactSexyComs = 1
+      vim.g.NERDDefaultAlign = 'left'
+
+      -- Keymappings
+      local map = vim.api.nvim_set_keymap
+      local opts = { noremap = true, silent = true }
+      local modes = { 'n', 'v', 'i' }
+
+      for _, mode in ipairs(modes) do
+        if mode == 'i' then
+          map(mode, '<C-_>', '<Esc>:call nerdcommenter#Comment(0, "toggle")<CR>gi', opts)
+        else
+          map(mode, '<C-_>', ':call nerdcommenter#Comment(0, "toggle")<CR>', opts)
+        end
+      end
+    end,
+  },
+  {
     'ThePrimeagen/harpoon',
     branch = 'harpoon2',
     dependencies = { 'nvim-lua/plenary.nvim' },
@@ -263,6 +292,9 @@ require('lazy').setup({
     config = function()
       require('competitest').setup {
         testcases_use_single_file = true,
+        template_file = {
+          cpp = '/home/bassam/Documents/cp/test.cpp',
+        },
       }
     end,
   },
@@ -535,7 +567,13 @@ require('lazy').setup({
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
-
+      local cmp = require 'cmp'
+      cmp.setup {
+        completion = {
+          keyword_length = 3, -- Start suggesting after 3 characters
+        },
+        max_item_count = 4, -- Limit to 4 suggestions
+      }
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --
@@ -921,5 +959,15 @@ vim.keymap.set('n', '<leader>f', function()
     end,
   }
 end, { desc = 'Format file' })
+vim.api.nvim_create_user_command('DiagnosticToggle', function()
+  local config = vim.diagnostic.config
+  local vt = config().virtual_text
+  config {
+    virtual_text = not vt,
+    underline = not vt,
+    signs = not vt,
+  }
+end, { desc = 'toggle diagnostic' })
+
 --The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
