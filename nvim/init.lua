@@ -303,6 +303,7 @@ require('lazy').setup({
     event = 'InsertEnter',
     config = function()
       -- Any configuration you want for pear-tree
+      vim.g.pear_tree_repeatable_expand = 0
       vim.g.pear_tree_smart_openers = 1
       vim.g.pear_tree_smart_closers = 1
       vim.g.pear_tree_smart_backspace = 1
@@ -585,7 +586,7 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         clangd = {},
-        --gopls = {},
+        gopls = {},
         pyright = {},
         rust_analyzer = {},
         tsserver = {},
@@ -674,6 +675,7 @@ require('lazy').setup({
         lua = { 'stylua' },
         cpp = { 'clang-format' },
         rust = { 'rustfmt' },
+        go = { 'goimports' },
         -- Conform can also run multiple formatters sequentially
         python = { 'isort', 'black' },
         --
@@ -854,11 +856,26 @@ require('lazy').setup({
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
   },
-  { -- Highlight, edit, and navigate code
+  {
+    -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'cpp',
+        'go',
+        'rust',
+        'python',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'vim',
+        'vimdoc',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
