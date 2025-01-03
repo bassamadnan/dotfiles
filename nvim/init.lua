@@ -987,6 +987,8 @@ vim.api.nvim_create_user_command('DiagnosticToggle', function()
     signs = not vt,
   }
 end, { desc = 'toggle diagnostic' })
-
+vim.api.nvim_set_hl(0, 'LineNrAbove', { fg = '#b2b8cf' })
+-- vim.api.nvim_set_hl(0, 'LineNr', { fg = 'yellow' })
+vim.api.nvim_set_hl(0, 'LineNrBelow', { fg = '#b2b8cf' })
 --The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
